@@ -1,4 +1,4 @@
-package biz.stillhart.biz.stillhart.rolo.model;
+package biz.stillhart.rolo.model;
 
 /**
  * Created by bzz on 22.06.2016.

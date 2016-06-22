@@ -1,4 +1,4 @@
-package biz.stillhart.biz.stillhart.rolo.model;
+package biz.stillhart.rolo.model;
 
 import java.util.Date;
 
