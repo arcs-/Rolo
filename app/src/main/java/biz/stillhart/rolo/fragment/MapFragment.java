@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import biz.stillhart.map.R;
-import biz.stillhart.server.JsonTools;
 import com.google.android.gms.maps.GoogleMap;
 
 import java.io.IOException;
@@ -14,6 +13,8 @@ import java.net.URL;
 import biz.stillhart.rolo.model.AudioController;
 import biz.stillhart.rolo.model.Player;
 import biz.stillhart.rolo.model.Renderer;
+import biz.stillhart.rolo.server.JsonTools;
+
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
