@@ -1,6 +1,7 @@
 package biz.stillhart.rolo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -8,8 +9,8 @@ import biz.stillhart.map.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
+import com.tapptitude.mapgpx.gpx.mapbox.MapBoxOnlineTileProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,8 +27,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
@@ -46,29 +47,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         final Activity activity = this;
+
         Thread thread = new Thread(new Runnable(){
             @Override
             public void run() {
 
+
+
                 try {
-                    JSONArray players = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/players"));
+                    boolean update = true;
+                    while(update) {
 
-                    for(int i = 0; i < players.length(); i++) {
-                        final JSONObject player = players.getJSONObject(i);
+                        mMap.clear();
 
-                        activity.runOnUiThread(new Runnable() {
-                            public void run() {
-                                try {
-                                    LatLng playerPos = new LatLng(Double.parseDouble(player.getString("lat")), Double.parseDouble(player.getString("lng")));
-                                    mMap.addMarker(new MarkerOptions().position(playerPos).title(player.getString("team")));
-                                }catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                        JSONArray players = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/players"));
+                        for (int i = 0; i < players.length(); i++) {
+                            final JSONObject player = players.getJSONObject(i);
+                            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.user);
+                            setPoint(activity, Double.parseDouble(player.getString("lat")), Double.parseDouble(player.getString("lng")), player.getString("team"), icon);
+                        }
+
+                        JSONArray flags = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/flags"));
+                        for (int i = 0; i < flags.length(); i++) {
+                            final JSONObject flag = flags.getJSONObject(i);
+                            BitmapDescriptor icon = null;
+                            if (flag.getString("team").equals("blue"))
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_blue);
+                            else if (flag.getString("team").equals("red"))
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_red);
+
+                            setPoint(activity, Double.parseDouble(flag.getString("lat")), Double.parseDouble(flag.getString("lng")), flag.getString("team"), icon);
+                        }
+
+                        Thread.sleep(1000);
                     }
 
-                }catch (IOException | JSONException e) {
+                }catch (IOException | JSONException | InterruptedException e) {
                     e.printStackTrace();
                 }
 
@@ -80,5 +94,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    public void setPoint(Activity activity, final double lat, final double lng, final String desc, final BitmapDescriptor icon) {
+        activity.runOnUiThread(new Runnable() {
+            public void run() {
+
+                    LatLng playerPos = new LatLng(lat, lng);
+                    mMap.addMarker(new MarkerOptions().position(playerPos).title(desc).icon(icon));
+            }
+        });
     }
 }
