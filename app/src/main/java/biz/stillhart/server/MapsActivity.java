@@ -1,4 +1,4 @@
-package biz.stillhart.rolo;
+package biz.stillhart.server;
 
 import android.app.Activity;
 import android.content.Context;
