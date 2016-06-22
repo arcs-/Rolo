@@ -1,4 +1,4 @@
-package biz.stillhart.rolo;
+package biz.stillhart.server;
 
 import org.json.JSONArray;
 import org.json.JSONException;

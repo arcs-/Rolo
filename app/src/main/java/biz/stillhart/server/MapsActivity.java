@@ -1,4 +1,4 @@
-package biz.stillhart.rolo;
+package biz.stillhart.server;
 
 import android.app.Activity;
 import android.support.v4.app.FragmentActivity;
