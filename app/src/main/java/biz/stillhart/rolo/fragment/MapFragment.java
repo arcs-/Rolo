@@ -14,12 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import biz.stillhart.map.R;
-import biz.stillhart.rolo.model.AudioController;
-import biz.stillhart.rolo.model.Player;
-import biz.stillhart.rolo.model.Renderer;
-import biz.stillhart.rolo.utils.CoordinateUtils;
-import biz.stillhart.rolo.utils.JsonTools;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,6 +23,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +31,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
+
+import biz.stillhart.map.R;
+import biz.stillhart.rolo.model.AudioController;
+import biz.stillhart.rolo.model.Player;
+import biz.stillhart.rolo.model.Renderer;
+import biz.stillhart.rolo.utils.CoordinateUtils;
+import biz.stillhart.rolo.utils.JsonTools;
 
 /**
  * Created by bzz on 22.06.2016.
@@ -169,15 +172,20 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
 
                         boolean taking = false;
                         boolean nearFlag = false;
+                        boolean isBlocked = false;
                         for (int i = 0; i < flags.length(); i++) {
                             final JSONObject flag = flags.getJSONObject(i);
                             BitmapDescriptor icon = null;
                             if (flag.getString("capture").equals("0"))
                                 icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_gray);
-                            else if (flag.getString("team").equals("blue"))
-                                icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_blue);
-                            else if (flag.getString("team").equals("red"))
-                                icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_red);
+                            else if (flag.getString("team").equals("blue")) {
+                                icon = !isBlocked ? BitmapDescriptorFactory.fromResource(R.drawable.flag_blue)
+                                        : BitmapDescriptorFactory.fromResource(R.drawable.blue_cross_hi);
+                            }
+                            else if (flag.getString("team").equals("red")) {
+                                icon = !isBlocked ? BitmapDescriptorFactory.fromResource(R.drawable.flag_red)
+                                        : BitmapDescriptorFactory.fromResource(R.drawable.Red_cross_md);
+                            }
 
                             double lat = Double.parseDouble(flag.getString("lat"));
                             double lng = Double.parseDouble(flag.getString("lng"));
@@ -198,7 +206,13 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
                                     }
                                 });
 
-                                if(status < 100 ) taking = true;
+                                if(status < 100 ) {
+                                    taking = true;
+                                } else {
+                                    taking = false;
+                                    currentPlayer.setPoints(currentPlayer.getPoints() + 1);
+                                    progressBar.setProgress(0);
+                                }
 
                             }
                         }
