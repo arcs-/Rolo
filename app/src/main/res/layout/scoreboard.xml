@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:weightSum="1">
+
+    <RelativeLayout
+        android:layout_width="235dp"
+        android:layout_height="194dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/rolo"></RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="183dp"
+            android:layout_height="92dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Score:"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal"
+            android:textSize="60sp"
+            android:textColor="#fcfcfc"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:text="Go Back"
+            android:id="@+id/button2"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.14"
+            android:textSize="30sp"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+</LinearLayout>
