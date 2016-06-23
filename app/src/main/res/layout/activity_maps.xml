@@ -4,5 +4,5 @@
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:id="@+id/map"
-          tools:context="biz.stillhart.rolo.server.MapsActivity"
+          tools:context="biz.stillhart.server.MapsActivity"
           android:name="com.google.android.gms.maps.SupportMapFragment"/>

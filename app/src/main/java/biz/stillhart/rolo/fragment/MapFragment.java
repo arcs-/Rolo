@@ -1,34 +1,59 @@
 package biz.stillhart.rolo.fragment;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import biz.stillhart.map.R;
-import com.google.android.gms.maps.GoogleMap;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.URL;
 
 import biz.stillhart.rolo.model.AudioController;
-import biz.stillhart.rolo.model.Player;
 import biz.stillhart.rolo.model.Renderer;
-import biz.stillhart.rolo.server.JsonTools;
-
+import biz.stillhart.rolo.utils.JsonTools;
+import com.google.android.gms.games.Player;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Array;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by bzz on 22.06.2016.
  */
-public class MapFragment extends FragmentActivity implements OnMapReadyCallback {
+public class MapFragment extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+
+    static final int PERMISSION = 233;
+
+    private String userId;
 
     protected GoogleMap mMap;
     protected Player currentPlayer;
@@ -37,47 +62,70 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback 
     protected Renderer renderer;
     protected AudioController audioController;
 
+    private Location location;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION);
+        } else setupApp();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setupApp();
+
+                } else {
+                    System.out.println("shit");
+                }
+            }
+
+        }
+    }
+
+    private void setupApp() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 500, 0, this);
+            System.out.println("worked");
+        }  else System.out.println("not really");
+
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        final Activity activity = this;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) mMap.setMyLocationEnabled(true);
 
+        final Activity activity = this;
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
 
+                boolean update = true;
+                while (update) {
 
-                try {
-                    boolean update = true;
-                    while (update) {
+                    try {
 
-                        JSONArray players = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/players"));
-                        JSONArray flags = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/flags"));
+
+                        JSONArray players = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/players/list"));
+                        JSONArray flags = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/flags/list"));
 
                         activity.runOnUiThread(new Runnable() {
                             public void run() {
-                            mMap.clear();
+                                mMap.clear();
                             }
                         });
 
@@ -90,19 +138,23 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback 
                         for (int i = 0; i < flags.length(); i++) {
                             final JSONObject flag = flags.getJSONObject(i);
                             BitmapDescriptor icon = null;
-                            if (flag.getString("team").equals("blue"))
+                            if (flag.getString("capture").equals("0"))
+                                icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_gray);
+                            else if (flag.getString("team").equals("blue"))
                                 icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_blue);
                             else if (flag.getString("team").equals("red"))
                                 icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_red);
 
-                            setPoint(activity, Double.parseDouble(flag.getString("lat")), Double.parseDouble(flag.getString("lng")), flag.getString("team"), icon);
+                            setPoint(activity, Double.parseDouble(flag.getString("lat")), Double.parseDouble(flag.getString("lng")), flag.getString("capture"), icon);
                         }
 
                         Thread.sleep(1000);
+
+
+                    } catch (IOException | JSONException | InterruptedException e) {
+                        e.printStackTrace();
                     }
 
-                } catch (IOException | JSONException | InterruptedException e) {
-                    e.printStackTrace();
                 }
 
 
@@ -112,7 +164,7 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback 
         thread.start();
 
 
-        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
     }
 
     public void setPoint(Activity activity, final double lat, final double lng, final String desc, final BitmapDescriptor icon) {
@@ -126,10 +178,50 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
+    boolean firstLocationUpdate = true;
+    @Override
+    public void onLocationChanged(Location location) {
 
-    public void updatePositions() {
+        final String lat = "lat=" + location.getLatitude();
+        final String lng = "&lng=" + location.getLongitude();
+        final String team = "&team=red";
 
+        final Activity activity = this;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (userId == null) {
+                        JSONObject newPlayer = JsonTools.readObjectFromUrl(new URL("http://172.16.171.121:2016/players/update?" + lat + lng + team));
+                        userId = newPlayer.getString("id");
+                    } else {
+                        JsonTools.readObjectFromUrl(new URL("http://172.16.171.121:2016/players/update?id=" + userId + "&" + lat + lng + team));
+                    }
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        thread.start();
+
+        LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
+        if (firstLocationUpdate) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPos, 19f));
+            firstLocationUpdate = false;
+        }
+        System.out.println("=>" + userId + location.getLatitude() + " " + location.getLongitude());
     }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+    @Override
+    public void onProviderEnabled(String provider) {}
+
+    @Override
+    public void onProviderDisabled(String provider) {}
 
     public void draw() {
 
