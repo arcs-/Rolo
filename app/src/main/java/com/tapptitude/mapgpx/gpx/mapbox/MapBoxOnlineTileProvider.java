@@ -1,42 +1,44 @@
 package com.tapptitude.mapgpx.gpx.mapbox;
 
-import android.util.Log;
-import com.google.android.gms.maps.model.UrlTileProvider;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.google.android.gms.maps.model.UrlTileProvider;
+
 public class MapBoxOnlineTileProvider extends UrlTileProvider {
 
-    public final String TAG = this.getClass().getCanonicalName();
     private static final String FORMAT;
 
-
-    // https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/256/4/4/4?access_token=cvb
-
-    // %s://api.mapbox.com/styles/v1/%s/tiles/256/%d/%d/%d?access_token=%s
     static {
-        FORMAT = "%s://api.mapbox.com/styles/v1/%s/tiles/256/%d/%d/%d?access_token=%s";
+        FORMAT = "%s://api.tiles.mapbox.com/v3/%s/%d/%d/%d.png";
     }
 
+    // ------------------------------------------------------------------------
+    // Instance Variables
+    // ------------------------------------------------------------------------
 
     private boolean mHttpsEnabled;
+
     private String mMapIdentifier;
-    private String mAccessToken;
 
+    // ------------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------------
 
-    public MapBoxOnlineTileProvider(String mapIdentifier, String accessToken) {
-        this(mapIdentifier, accessToken, false);
+    public MapBoxOnlineTileProvider(String mapIdentifier) {
+        this(mapIdentifier, false);
     }
 
-    public MapBoxOnlineTileProvider(String mapIdentifier, String accessToken, boolean https) {
+    public MapBoxOnlineTileProvider(String mapIdentifier, boolean https) {
         super(256, 256);
 
         this.mHttpsEnabled = https;
         this.mMapIdentifier = mapIdentifier;
-        this.mAccessToken = accessToken;
     }
 
+    // ------------------------------------------------------------------------
+    // Public Methods
+    // ------------------------------------------------------------------------
 
     /**
      * The MapBox map identifier being used by this provider.
@@ -74,26 +76,13 @@ public class MapBoxOnlineTileProvider extends UrlTileProvider {
         this.mHttpsEnabled = enabled;
     }
 
-    /**
-     * The MapBox Acces Token found in Account Settings.
-     */
-    public String getAccessToken() {
-        return mAccessToken;
-    }
-
-    public void setAccessToken(String mAccessToken) {
-        this.mAccessToken = mAccessToken;
-    }
-
     @Override
     public URL getTileUrl(int x, int y, int z) {
         try {
             String protocol = this.mHttpsEnabled ? "https" : "http";
-            final String url = String.format(FORMAT,
-                    protocol, this.mMapIdentifier, z, x, y, this.mAccessToken);
-            Log.d(TAG, url);
-            return new URL(url);
-        } catch (MalformedURLException e) {
+            return new URL(String.format(FORMAT, protocol, this.mMapIdentifier, z, x, y));
+        }
+        catch (MalformedURLException e) {
             return null;
         }
     }

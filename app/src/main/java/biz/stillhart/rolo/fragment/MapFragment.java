@@ -14,16 +14,18 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import biz.stillhart.map.R;
+import biz.stillhart.rolo.model.AudioController;
+import biz.stillhart.rolo.model.Player;
+import biz.stillhart.rolo.model.Renderer;
+import biz.stillhart.rolo.utils.CoordinateUtils;
+import biz.stillhart.rolo.utils.JsonTools;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
+import com.google.android.gms.maps.model.*;
+import com.tapptitude.mapgpx.gpx.mapbox.MapBoxOnlineTileProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,13 +33,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
-
-import biz.stillhart.map.R;
-import biz.stillhart.rolo.model.AudioController;
-import biz.stillhart.rolo.model.Player;
-import biz.stillhart.rolo.model.Renderer;
-import biz.stillhart.rolo.utils.CoordinateUtils;
-import biz.stillhart.rolo.utils.JsonTools;
 
 /**
  * Created by bzz on 22.06.2016.
@@ -136,6 +131,22 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Create new TileOverlayOptions instance.
+        TileOverlayOptions opts = new TileOverlayOptions();
+
+// Find your MapBox online map ID.
+        String myMapID = "mapbox/dark-v9";
+
+// Create an instance of MapBoxOnlineTileProvider.
+        MapBoxOnlineTileProvider provider = new MapBoxOnlineTileProvider(myMapID);
+
+// Set the tile provider on the TileOverlayOptions.
+        opts.tileProvider(provider);
+
+// Add the tile overlay to the map.
+        TileOverlay overlay = mMap.addTileOverlay(opts);
+
 
         // if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) mMap.setMyLocationEnabled(true);
 
