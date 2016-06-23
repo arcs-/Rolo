@@ -24,10 +24,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
+import com.tapptitude.mapgpx.gpx.mapbox.MapBoxOnlineTileProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,6 +131,22 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Create new TileOverlayOptions instance.
+        TileOverlayOptions opts = new TileOverlayOptions();
+
+// Find your MapBox online map ID.
+        String myMapID = "mapbox/dark-v9";
+
+// Create an instance of MapBoxOnlineTileProvider.
+        MapBoxOnlineTileProvider provider = new MapBoxOnlineTileProvider(myMapID);
+
+// Set the tile provider on the TileOverlayOptions.
+        opts.tileProvider(provider);
+
+// Add the tile overlay to the map.
+        TileOverlay overlay = mMap.addTileOverlay(opts);
+
 
         // if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) mMap.setMyLocationEnabled(true);
 
