@@ -189,8 +189,8 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
                     try {
 
 
-                        JSONArray players = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/players/list"));
-                        JSONArray flags = JsonTools.readArrayFromUrl(new URL("http://172.16.171.121:2016/flags/list"));
+                        JSONArray players = JsonTools.readArrayFromUrl(new URL("http://rolo.stillhart.biz:2016/players/list"));
+                        JSONArray flags = JsonTools.readArrayFromUrl(new URL("http://rolo.stillhart.biz:2016/flags/list"));
 
                         activity.runOnUiThread(new Runnable() {
                             public void run() {
@@ -236,7 +236,7 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
                                 System.out.println("close to " + flag.getString("id") + " >> " + CoordinateUtils.distanceInKm(lat, lng, currentPlayer.getPosition().getLatitude(), currentPlayer.getPosition().getLongitude()));
 
                                 nearFlag = true;
-                                final int status = JsonTools.readObjectFromUrl(new URL("http://172.16.171.121:2016/flags/capture?id=" + flag.getString("id") + "&team=" + currentPlayer.getTeam())).getInt("capture");
+                                final int status = JsonTools.readObjectFromUrl(new URL("http://rolo.stillhart.biz:2016/flags/capture?id=" + flag.getString("id") + "&team=" + currentPlayer.getTeam())).getInt("capture");
 
                                 // show bar
                                 activity.runOnUiThread(new Runnable() {
@@ -308,13 +308,13 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
             public void run() {
                 try {
                     if (currentPlayer == null) {
-                        JSONObject newPlayer = JsonTools.readObjectFromUrl(new URL("http://172.16.171.121:2016/players/update?" + lat + lng + "&team="+team));
+                        JSONObject newPlayer = JsonTools.readObjectFromUrl(new URL("http://rolo.stillhart.biz:2016/players/update?" + lat + lng + "&team="+team));
                         currentPlayer = new Player();
                         currentPlayer.setId(newPlayer.getString("id"));
                         currentPlayer.setTeam(team);
                         currentPlayer.setPosition(location);
                     } else {
-                        JsonTools.readObjectFromUrl(new URL("http://172.16.171.121:2016/players/update?id=" + currentPlayer.getId() + "&" + lat + lng + "&team=" + currentPlayer.getTeam()));
+                        JsonTools.readObjectFromUrl(new URL("http://rolo.stillhart.biz:2016/players/update?id=" + currentPlayer.getId() + "&" + lat + lng + "&team=" + currentPlayer.getTeam()));
                         currentPlayer.setPosition(location);
                     }
 
@@ -374,7 +374,7 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void run() {
                 try {
-                    if (currentPlayer != null) JsonTools.readObjectFromUrl(new URL("http://172.16.171.121:2016/players/delete?id=" + currentPlayer.getId()));
+                    if (currentPlayer != null) JsonTools.readObjectFromUrl(new URL("http://rolo.stillhart.biz:2016/players/delete?id=" + currentPlayer.getId()));
 
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
