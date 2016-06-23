@@ -182,6 +182,7 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void run() {
 
+                boolean isBlocked = false;
                 boolean update = true;
                 while (update) {
 
@@ -210,7 +211,7 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
 
                         boolean taking = false;
                         boolean nearFlag = false;
-                        boolean isBlocked = false;
+
                         for (int i = 0; i < flags.length(); i++) {
                             final JSONObject flag = flags.getJSONObject(i);
                             BitmapDescriptor icon;
