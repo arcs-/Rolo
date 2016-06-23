@@ -3,17 +3,17 @@ package biz.stillhart.rolo.model;
 /**
  * Created by bzz on 22.06.2016.
  */
-public class Player {
+public class Player extends Actor {
 
-    protected String name;
-    protected Team team;
+    protected String id;
+    protected String team;
     protected int points;
 
-    public Team getTeam() {
+    public String getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(String team) {
         this.team = team;
     }
 
@@ -25,12 +25,12 @@ public class Player {
         this.points = points;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
 }

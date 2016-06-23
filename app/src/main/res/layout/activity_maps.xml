@@ -1,7 +1,51 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:id="@+id/map"
-          tools:context="biz.stillhart.server.MapsActivity"
-          android:name="com.google.android.gms.maps.SupportMapFragment"/>
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:background="#000">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/map"
+              tools:context="biz.stillhart.server.MapsActivity"
+              android:name="com.google.android.gms.maps.SupportMapFragment" android:layout_below="@+id/progressBar"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" android:visibility="gone"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Finding Location"
+            android:id="@+id/finding"
+            android:layout_marginTop="85dp" android:textColor="#fff" android:textStyle="bold"
+            android:layout_below="@+id/progressBar" android:layout_centerHorizontal="true"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick a team"
+            android:id="@+id/pick"
+            android:layout_below="@+id/finding" android:layout_centerHorizontal="true" android:textColor="#fff"
+            android:layout_marginTop="10dp"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/finding" android:layout_alignLeft="@+id/finding"
+            android:layout_alignStart="@+id/finding" android:layout_marginTop="53dp">
+        <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:id="@+id/redteam" android:src="@drawable/flag_red"/>
+        <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:id="@+id/blueteam" android:src="@drawable/flag_blue"/>
+    </LinearLayout>
+
+</RelativeLayout>

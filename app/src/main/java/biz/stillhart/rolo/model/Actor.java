@@ -1,6 +1,7 @@
 package biz.stillhart.rolo.model;
 
 import android.graphics.Bitmap;
+import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -9,7 +10,7 @@ import com.google.android.gms.maps.model.LatLng;
 public abstract class Actor {
 
     protected Bitmap image;
-    protected LatLng position;
+    protected Location position;
 
     public Bitmap getImage() {
         return image;
@@ -19,11 +20,11 @@ public abstract class Actor {
         this.image = image;
     }
 
-    public LatLng getPosition() {
+    public Location getPosition() {
         return position;
     }
 
-    public void setPosition(LatLng position) {
+    public void setPosition(Location position) {
         this.position = position;
     }
 }
