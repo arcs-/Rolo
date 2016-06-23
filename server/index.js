@@ -17,6 +17,22 @@ if(global.players === undefined) {
   global.players = []
 }
 
+app.get('/reset', function (req, res) {
+	
+	global.flags = [{id:shortid.generate(), lat:"47.2591047", lng:"8.58588499", team: "blue", capture: 5},
+                    {id:shortid.generate(), lat:"47.259882", lng:"8.585152", team: "red", capture: 5},
+                    {id:shortid.generate(), lat:"47.259882", lng:"8.585731", team: "blue", capture: 20},
+                    {id:shortid.generate(), lat:"47.258783", lng:"8.5860585", team: "red", capture: 100},
+                    {id:shortid.generate(), lat:"47.25897703", lng:"8.58528803", team: "red", capture: 0}]
+				  
+	global.players = []
+				  
+    res.setHeader('Content-Type', 'application/json')
+    res.send(JSON.stringify({"status":"reset"}))
+
+})
+
+
 app.get('/flags/list', function (req, res) {
     res.setHeader('Content-Type', 'application/json')
     res.send(JSON.stringify(global.flags))
