@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -132,20 +133,46 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Create new TileOverlayOptions instance.
-        TileOverlayOptions opts = new TileOverlayOptions();
+        TileProvider tileProvider = new UrlTileProvider(256, 256) {
+            @Override
+            public URL getTileUrl(int x, int y, int zoom) {
+                System.out.println("tile");
 
-// Find your MapBox online map ID.
-        String myMapID = "mapbox/dark-v9";
+                String s = String.format("https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/256/%d/%d/%d?access_token=pk.eyJ1IjoiYXJjcyIsImEiOiJjaXBxbnd6cWwwMDVoaTFucGI2b3hlbTd4In0.NEBO1ZGzFSLjXVxHhCBrYQ",
+                        zoom, x, y);
 
-// Create an instance of MapBoxOnlineTileProvider.
-        MapBoxOnlineTileProvider provider = new MapBoxOnlineTileProvider(myMapID);
 
-// Set the tile provider on the TileOverlayOptions.
-        opts.tileProvider(provider);
+                //if (!checkTileExists(x, y, zoom))  return null;
 
-// Add the tile overlay to the map.
-        TileOverlay overlay = mMap.addTileOverlay(opts);
+                System.out.println("get tile " + s);
+                try {
+                    return new URL(s);
+                } catch (MalformedURLException e) {
+                    throw new AssertionError(e);
+                }
+            }
+
+            /*
+             * Check that the tile server supports the requested x, y and zoom.
+             * Complete this stub according to the tile range you support.
+             * If you support a limited range of tiles at different zoom levels, then you
+             * need to define the supported x, y range at each zoom level.
+             */
+            private boolean checkTileExists(int x, int y, int zoom) {
+                int minZoom = 12;
+                int maxZoom = 16;
+
+                if ((zoom < minZoom || zoom > maxZoom)) {
+                    return false;
+                }
+
+                return true;
+            }
+        };
+
+        TileOverlay tileOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(tileProvider));
+//        tileOverlay.clearTileCache();
+
 
 
         // if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) mMap.setMyLocationEnabled(true);
@@ -186,17 +213,17 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
                         boolean isBlocked = false;
                         for (int i = 0; i < flags.length(); i++) {
                             final JSONObject flag = flags.getJSONObject(i);
-                            BitmapDescriptor icon = null;
+                            BitmapDescriptor icon;
                             if (flag.getString("capture").equals("0"))
                                 icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_gray);
                             else if (flag.getString("team").equals("blue")) {
                                 icon = !isBlocked ? BitmapDescriptorFactory.fromResource(R.drawable.flag_blue)
-                                        : BitmapDescriptorFactory.fromResource(R.drawable.blue_cross_hi);
+                                        : BitmapDescriptorFactory.fromResource(R.drawable.blue_cross);
                             }
                             else if (flag.getString("team").equals("red")) {
                                 icon = !isBlocked ? BitmapDescriptorFactory.fromResource(R.drawable.flag_red)
-                                        : BitmapDescriptorFactory.fromResource(R.drawable.Red_cross_md);
-                            }
+                                        : BitmapDescriptorFactory.fromResource(R.drawable.red_cross);
+                            } else icon = BitmapDescriptorFactory.fromResource(R.drawable.flag_gray);
 
                             double lat = Double.parseDouble(flag.getString("lat"));
                             double lng = Double.parseDouble(flag.getString("lng"));
@@ -221,6 +248,7 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
                                     taking = true;
                                 } else {
                                     taking = false;
+                                    isBlocked = true;
                                     currentPlayer.setPoints(currentPlayer.getPoints() + 1);
                                     progressBar.setProgress(0);
                                 }
@@ -294,9 +322,10 @@ public class MapFragment extends FragmentActivity implements OnMapReadyCallback,
                         @Override
                         public void run() {
                             LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPos, 18f));
+
                             if (firstLocationUpdate) {
                                 finding.setVisibility(View.INVISIBLE);
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPos, 18f));
                                 if(pick.getVisibility() != View.VISIBLE) mapView.setAlpha(1);
                                  firstLocationUpdate = false;
                             }
