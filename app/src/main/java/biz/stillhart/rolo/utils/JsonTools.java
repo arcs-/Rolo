@@ -1,5 +1,13 @@
-package biz.stillhart.rolo.server;
+package biz.stillhart.rolo.utils;
 
+import android.os.Looper;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,6 +15,8 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+
+import static java.net.Proxy.Type.HTTP;
 
 /**
  * Created by About  23 Ninjas on 01.02.2016.
