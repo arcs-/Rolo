@@ -1,11 +1,10 @@
 package com.tapptitude.mapgpx.gpx.mapbox;
 
 import android.util.Log;
+import com.google.android.gms.maps.model.UrlTileProvider;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import com.google.android.gms.maps.model.UrlTileProvider;
 
 public class MapBoxOnlineTileProvider extends UrlTileProvider {
 

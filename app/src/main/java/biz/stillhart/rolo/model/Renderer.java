@@ -1,6 +1,7 @@
 package biz.stillhart.rolo.model;
 
 import com.google.android.gms.maps.GoogleMap;
+
 import java.lang.reflect.Array;
 
 /**

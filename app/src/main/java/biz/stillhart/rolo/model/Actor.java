@@ -1,7 +1,6 @@
 package biz.stillhart.rolo.model;
 
 import android.graphics.Bitmap;
-
 import com.google.android.gms.maps.model.LatLng;
 
 /**
